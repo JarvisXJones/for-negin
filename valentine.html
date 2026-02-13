@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine Card</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script:wght@600&family=Quicksand:wght@500&display=swap');
+
+body {
+    margin: 0;
+    height: 100vh;
+    background: #f7c6d9;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    position: relative;
+}
+
+/* hearts layer */
+.hearts-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0; left: 0;
+    z-index: 0;
+}
+.heart {
+    position: absolute;
+    top: -30px;
+    color: white;
+    animation: fall linear infinite;
+    opacity: 0.9;
+}
+@keyframes fall { to { transform: translateY(110vh); } }
+
+/* main container */
+.center {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1000px;
+    position: relative;
+    z-index: 2;
+}
+
+/* envelope */
+.wrapper { text-align: center; position: relative; }
+.envelope {
+    width: 280px;
+    height: 180px;
+    background: #fff;
+    border-radius: 14px;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    transform-style: preserve-3d;
+    transform-origin: top center;
+    z-index: 2;
+    transition: transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+.envelope.open { transform: rotateX(-160deg); }
+.flap { position: absolute; inset: 0; background: #ffe3ec; clip-path: polygon(0 0, 100% 0, 50% 55%); z-index: 1; }
+
+.envelope-text {
+    position: absolute;
+    bottom: 26px;
+    width: 100%;
+    text-align: center;
+    font-family: 'Pacifico', cursive;
+    font-size: 18px;
+    color: #b23a6f;
+    z-index: 3;
+}
+.sub-text { font-size: 12px; margin-top: -4px; }
+
+.seal {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 54px;
+    height: 54px;
+    background: #c62828;
+    border-radius: 50%;
+    color: #fff;
+    font-family: 'Dancing Script', cursive;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+.seal.break { animation: crack 0.5s ease forwards; }
+@keyframes crack {
+    30% { transform: translateX(-50%) rotate(10deg); }
+    60% { transform: translateX(-50%) rotate(-10deg); }
+    100% { transform: translateX(-50%) scale(0); }
+}
+
+.buttons {
+    margin-top: 18px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    font-family: 'Quicksand', sans-serif;
+    z-index: 2;
+}
+.buttons button {
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: white;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+.card {
+    display: none;
+    position: absolute;
+    background: rgba(255,255,255,0.45);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px 25px;
+    width: 85%;
+    max-width: 360px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    z-index: 2;
+}
+
+#text { font-size: 18px; line-height: 1.9; color: #4a2b3a; white-space: pre-line; }
+.cursor { display: inline-block; width: 6px; height: 18px; background: #4a2b3a; animation: blink 1s infinite; }
+
+/* rose emoji floating - 40% bigger */
+.rose-emoji {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 154px;
+    z-index: 1;
+    cursor: pointer;
+    animation: floatRose 2.5s ease-in-out infinite alternate;
+}
+@keyframes floatRose {
+    0% { transform: translateX(-50%) translateY(0); }
+    100% { transform: translateX(-50%) translateY(-8px); }
+}
+
+/* flying kisses */
+.kiss {
+    position: absolute;
+    font-size: 60px; 
+    animation: fly 20s ease-in forwards, sway 4s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: 999;
+}
+@keyframes fly {
+    0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(-250px) scale(1.2) rotate(15deg); opacity: 0; }
+}
+@keyframes sway {
+    0% { transform: translateY(var(--y,0)) rotate(-5deg); }
+    100% { transform: translateY(var(--y,0)) rotate(5deg); }
+}
+
+/* kiss button */
+#kiss-btn {
+    margin-top: 15px;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    background: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    font-family: 'Pacifico', cursive; 
+    color: #c62828;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+    transform: translateZ(0);
+}
+#kiss-btn:active { transform: translateZ(0) scale(0.95); }
+</style>
+</head>
+
+<body>
+
+<div class="hearts-container" id="hearts"></div>
+
+<div class="center">
+    <div class="wrapper">
+        <div class="envelope" id="envelope">
+            <div class="flap"></div>
+            <div class="seal" id="seal">J♡N</div>
+            <div class="envelope-text">
+                Will u be my Valentine
+                <div class="sub-text">for Negin</div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button onclick="openLetter()">Yes</button>
+            <button onclick="openLetter()">Absolutely</button>
+            <button onclick="nope()">No</button>
+        </div>
+    </div>
+
+    <div class="card" id="card">
+        <div id="text"></div>
+        <span class="cursor"></span>
+        <!-- kiss button -->
+        <button id="kiss-btn" onclick="sendKiss()">the kiss button</button>
+    </div>
+
+    <!-- rose emoji floating -->
+    <div class="rose-emoji" id="rose">🌹</div>
+</div>
+
+<script>
+/* hearts */
+const heartContainer = document.getElementById('hearts');
+for(let i=0;i<50;i++){
+    const h=document.createElement("div");
+    h.className="heart";
+    h.innerHTML="♡";
+    h.style.left=Math.random()*100+"vw";
+    h.style.fontSize=(16+Math.random()*14)+"px";
+    h.style.animationDuration=(6+Math.random()*6)+"s";
+    h.style.animationDelay=Math.random()*5+"s";
+    heartContainer.appendChild(h);
+}
+
+/* gyroscope */
+function enableMotion(){
+    if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function'){
+        DeviceOrientationEvent.requestPermission().then(response=>{
+            if(response=='granted'){window.addEventListener('deviceorientation', moveEnvelope);}
+        }).catch(console.error);
+    } else { window.addEventListener('deviceorientation', moveEnvelope); }
+}
+function moveEnvelope(e){
+    const x=e.gamma/3;
+    const y=e.beta/3;
+    document.getElementById("envelope").style.transform=`rotateY(${x}deg) rotateX(${-y}deg)`;
+    
+    // Move kisses along with device
+    document.querySelectorAll('.kiss').forEach(k=>{
+        let rect = k.getBoundingClientRect();
+        k.style.left = (rect.left + x*0.5) + "px";
+        k.style.top = (rect.top + y*0.5) + "px";
+    });
+}
+window.addEventListener('load', ()=>{enableMotion();});
+
+/* envelope open */
+function openLetter(){
+    document.querySelector(".buttons").style.display="none";
+    const seal = document.getElementById("seal");
+    seal.classList.add("break");
+    setTimeout(()=>{document.getElementById("envelope").classList.add("open");},300);
+    setTimeout(()=>{
+        document.getElementById("envelope").style.display="none";
+        document.getElementById("card").style.display="block";
+        typeWriter();
+    },1100);
+}
+function nope(){
+    alert("میدونستم دوس داری دکمه نه رو تست کنی 😅\nولی مگه دست خودته؟");
+}
+
+/* message typing */
+const message=`سلام دختره ❤️، ولنتاین مبارک
+شاید امروز اون طوری که تو ذهنم بود نشد،
+اما یه چیز همیشه ثابت:
+
+این که عاشقتم و این قشنگترین حسی هست که دارم
+ممنونم برای آرامشی که بهم دادی
+
+بوس از طرف شایان 😘`;
+
+let i=0;
+function typeWriter(){
+    const el=document.getElementById("text");
+    if(i<message.length){el.innerHTML+=message.charAt(i);i++;setTimeout(typeWriter,40);}
+}
+
+/* kiss button logic */
+let kissCount = 0;
+function sendKiss(){
+    if(kissCount >= 100) return;
+    kissCount++;
+    const kiss = document.createElement('div');
+    kiss.className = 'kiss';
+    kiss.innerHTML = '💋';
+    kiss.style.left = Math.random() * 80 + 10 + 'vw';
+    kiss.style.top = Math.random() * 60 + 20 + 'vh';
+    document.body.appendChild(kiss);
+    setTimeout(()=>{kiss.remove();}, 20000); 
+}
+
+/* secret rose click */
+document.getElementById('rose').addEventListener('click', ()=>{
+    alert("I wanted to say thank you for putting up with my stupidity, my boredom, or the fact that I don't know many things. Know this, shayan want to hug you every second, I will always protect you, I love you my Negin 🫶");
+});
+</script>
+
+</body>
+</html>
